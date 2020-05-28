@@ -26,4 +26,14 @@ public class Utils {
         error.put("code", errorCode);
         return new JSONObject(error);
     }
+
+    public static JSONObject exceptionToCodeWithE(String errorMsg) {
+        int errorCode = 400;
+        HashMap<String, Object> error = new HashMap<>();
+        HashMap<String, Object> fullError = new HashMap<>();
+        error.put("error", errorMsg);
+        error.put("code", errorCode);
+        fullError.put("e", error);
+        return new JSONObject(fullError);
+    }
 }

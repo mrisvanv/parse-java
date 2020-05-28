@@ -25,6 +25,10 @@ public class ParseObject {
         data.put(key, value);
     }
 
+    public void put(String key, ParseFile file) {
+        data.put(key, file.getFileObject());
+    }
+
     public void set(String objectId) {
         this.objectId = objectId;
     }

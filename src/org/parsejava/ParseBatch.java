@@ -43,6 +43,10 @@ public class ParseBatch {
         objects.add(new JSONObject(objectData));
     }
 
+    public long length() {
+        return objects.size();
+    }
+
     public JSONObject processBatch() {
         HashMap<String, Object> requests = new HashMap<>();
         requests.put("requests", new JSONArray(objects));

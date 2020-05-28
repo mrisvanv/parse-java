@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.parsejava.Parse.MASTER_ID;
 import static org.parsejava.Parse.PARSE_LOGGER;
 
 
@@ -33,6 +34,9 @@ public class BatchRelated {
             HttpRequestWithBody request = Unirest.post(CLASS_PATH);
             request.header(Constants.HEADER_APP_ID, Parse.APP_ID)
                     .header(Constants.HEADER_CLIENT_KEY, Parse.CLIENT_ID);
+            if (Parse.MASTER_ID != null && !Parse.MASTER_ID.equals("")) {
+                request.header(Constants.HEADER_MASTER_KEY, MASTER_ID);
+            }
             String sessionId = ParseUser.getCurrentUser().getSessionId();
             if (sessionId != null && !sessionId.trim().equals("")) {
                 request.header(Constants.HEADER_SESSION_TOKEN, sessionId);
@@ -45,16 +49,15 @@ public class BatchRelated {
             } else {
                 result.put("e", new JSONObject(response.getBody()));
             }
-        } catch (
-                UnirestException e) {
+        } catch (UnirestException e) {
             JSONObject errorCode = Utils.exceptionToCode(e);
             result.put("e", errorCode);
             if (errorCode.optInt("code") == 0) {
                 LOGGER.log(Level.WARNING, "Server communication failed", e);
             }
-            return new JSONObject(result);
-        } catch (
-                JSONException e) {
+        } catch (JSONException e) {
+            JSONObject errorCode = Utils.exceptionToCode(e);
+            result.put("e", errorCode);
             LOGGER.log(Level.WARNING, "Converting to json failed", e);
         }
         return new JSONObject(result);

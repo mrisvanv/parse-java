@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 public class Parse {
     public static String APP_ID = null;
     public static String CLIENT_ID = null;
+    public static String MASTER_ID = null;
     public static String SERVER_URL = null;
     public static String DB_NAME = null;
 
@@ -17,6 +18,15 @@ public class Parse {
     public static void initialize(String appId, String clientKey, String serverUrl) {
         APP_ID = appId;
         CLIENT_ID = clientKey;
+        SERVER_URL = serverUrl;
+        String[] urls = serverUrl.split("/");
+        DB_NAME = urls[urls.length - 1];
+    }
+
+    public static void initialize(String appId, String clientKey, String serverUrl, String masterKey) {
+        APP_ID = appId;
+        CLIENT_ID = clientKey;
+        MASTER_ID = masterKey;
         SERVER_URL = serverUrl;
         String[] urls = serverUrl.split("/");
         DB_NAME = urls[urls.length - 1];

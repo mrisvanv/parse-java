@@ -15,7 +15,7 @@ import static org.parsejava.restexecutors.UserRelated.doLogout;
  */
 public class ParseUser {
     public static String errMsg = null;
-    private static ParseUser currentUser = null;
+    private static ParseUser currentUser = new ParseUser();
     private String username = null;
     private String userId = null;
     private String email = null;
@@ -97,7 +97,7 @@ public class ParseUser {
                     errMsg = result.optString("error");
                     return false;
                 }
-                currentUser = null;
+                currentUser = new ParseUser();
                 return true;
             }
         }
