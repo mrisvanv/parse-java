@@ -22,11 +22,12 @@ public class ParseObject {
     }
 
     public void put(String key, Object value) {
+        if (ParseFile.class.equals(value.getClass())) {
+            value = ((ParseFile) value).getFileObject();
+        } else if (ParsePointer.class.equals(value.getClass())) {
+            value = ((ParsePointer) value).get();
+        }
         data.put(key, value);
-    }
-
-    public void put(String key, ParseFile file) {
-        data.put(key, file.getFileObject());
     }
 
     public void set(String objectId) {

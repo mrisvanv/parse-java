@@ -3,6 +3,7 @@ package org.parsejava;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import static org.parsejava.restexecutors.QueryRelated.restGet;
  */
 public class ParseQuery {
     private final HashMap<String, Object> whereConditions = new HashMap<>();
+    private final List<String> includes = new ArrayList<>();
     private String className = null;
     private long limit = 10000000;//set as default value
     private String order = "";
@@ -35,6 +37,9 @@ public class ParseQuery {
     }
 
     public void whereEqualTo(String objectName, Object value) {
+        if(value.getClass()==ParsePointer.class){
+            value=((ParsePointer)value).get();
+        }
         whereConditions.put(objectName, value);
     }
 
@@ -62,6 +67,9 @@ public class ParseQuery {
         this.order += ",-" + order;
     }
 
+    public void include(String includeColumn){
+        includes.add(includeColumn);
+    }
     public void whereContainedIn(String objectName, List<Object> values) {
         HashMap<String, Object> inList = new HashMap<>();
         inList.put("$in", new JSONArray(values));
@@ -87,6 +95,10 @@ public class ParseQuery {
         }
         if (isCount) {
             request.put("count", 1);
+        }
+        if(includes.size()>0){
+            String includeColumns=includes.toString();
+            request.put("include", includeColumns.substring(1,includeColumns.length()-1).replace(" ",""));
         }
         return restGet(new JSONObject(request), this.className);
     }
