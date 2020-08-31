@@ -45,6 +45,10 @@ public class ParseFile {
         }
         return result;
     }
+    public JSONObject delete() {
+        JSONObject result = FileRelated.restFileDelete(fileName);
+        return result;
+    }
 
     JSONObject getFileObject() {
         return new JSONObject(object);

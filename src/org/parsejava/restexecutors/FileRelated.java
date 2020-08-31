@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.parsejava.Parse.MASTER_ID;
 import static org.parsejava.Parse.PARSE_LOGGER;
 
 /**
@@ -34,6 +35,9 @@ public class FileRelated {
             HttpRequestWithBody request = Unirest.post(CLASS_PATH + fileName);
             request.header(Constants.HEADER_APP_ID, Parse.APP_ID)
                     .header(Constants.HEADER_CLIENT_KEY, Parse.CLIENT_ID);
+            if (Parse.MASTER_ID != null && !Parse.MASTER_ID.equals("")) {
+                request.header(Constants.HEADER_MASTER_KEY, MASTER_ID);
+            }
             String sessionId = ParseUser.getCurrentUser().getSessionId();
             if (sessionId != null && !sessionId.trim().equals("")) {
                 request.header(Constants.HEADER_SESSION_TOKEN, sessionId);
@@ -43,6 +47,46 @@ public class FileRelated {
             request.header("Content-Type", "image/jpeg");
             request.header("Cache-Control", "no-cache");
             request.body(data);
+            HttpResponse<String> response = request.asString();
+            if (response.getStatus() == 201) {
+                result.put("d", new JSONObject(response.getBody()));
+            } else {
+                result.put("e", new JSONObject(response.getBody()));
+            }
+        } catch (UnirestException e) {
+            JSONObject errorCode = Utils.exceptionToCode(e);
+            result.put("e", errorCode);
+            if (errorCode.optInt("code") == 0) {
+                LOGGER.log(Level.WARNING, "Server communication failed", e);
+            }
+        } catch (JSONException e) {
+            JSONObject errorCode = Utils.exceptionToCode(e);
+            result.put("e", errorCode);
+            LOGGER.log(Level.WARNING, "Converting to json failed", e);
+        } catch (Exception e) {
+            JSONObject errorCode = Utils.exceptionToCode(e);
+            result.put("e", errorCode);
+            LOGGER.log(Level.WARNING, "Not a valid file name", e);
+        }
+        return new JSONObject(result);
+    }
+
+    public static JSONObject restFileDelete(String fileName) {
+        HashMap<String, Object> result = new HashMap<>();
+        try {
+            HttpRequestWithBody request = Unirest.delete(CLASS_PATH + fileName);
+            request.header(Constants.HEADER_APP_ID, Parse.APP_ID)
+                    .header(Constants.HEADER_CLIENT_KEY, Parse.CLIENT_ID);
+            if (Parse.MASTER_ID != null && !Parse.MASTER_ID.equals("")) {
+                request.header(Constants.HEADER_MASTER_KEY, MASTER_ID);
+            }
+            String sessionId = ParseUser.getCurrentUser().getSessionId();
+            if (sessionId != null && !sessionId.trim().equals("")) {
+                request.header(Constants.HEADER_SESSION_TOKEN, sessionId);
+            }
+//            String contentType = fileNameTOMime(fileName);
+//            request.header(Constants.CONTENT_TYPE, contentType.trim());
+            request.header("Cache-Control", "no-cache");
             HttpResponse<String> response = request.asString();
             if (response.getStatus() == 201) {
                 result.put("d", new JSONObject(response.getBody()));

@@ -103,6 +103,11 @@ public class ParseQuery {
         return restGet(new JSONObject(request), this.className);
     }
 
+    public JSONObject get(String objectId) {
+        HashMap<String, Object> request = new HashMap<>();
+        request.put("id",objectId);
+        return restGet(new JSONObject(request), this.className);
+    }
     public JSONObject findAndCount() {
         this.isCount = true;
         return find();

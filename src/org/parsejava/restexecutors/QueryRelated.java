@@ -31,7 +31,12 @@ public class QueryRelated {
     public static JSONObject restGet(JSONObject requestData, String className) {
         HashMap<String, Object> result = new HashMap<>();
         try {
-            HttpRequest request = Unirest.get(CLASS_PATH + className);
+            HttpRequest request;
+            if(requestData.has("id")) {
+                request = Unirest.get(CLASS_PATH + className+"/"+requestData.getString("id"));
+            }else{
+                request = Unirest.get(CLASS_PATH + className);
+            }
             request.header(Constants.HEADER_APP_ID, Parse.APP_ID)
                     .header(Constants.HEADER_CLIENT_KEY, Parse.CLIENT_ID);
             if (Parse.MASTER_ID != null && !Parse.MASTER_ID.equals("")) {
@@ -41,16 +46,22 @@ public class QueryRelated {
             if (sessionId != null && !sessionId.trim().equals("")) {
                 request.header(Constants.HEADER_SESSION_TOKEN, sessionId);
             }
-            for (Iterator it = requestData.keys(); it.hasNext(); ) {
-                String key = (String) it.next();
-                request.queryString(key, requestData.get(key));
+            if(!requestData.has("id")) {
+                for (Iterator it = requestData.keys(); it.hasNext(); ) {
+                    String key = (String) it.next();
+                    request.queryString(key, requestData.get(key));
+                }
             }
             HttpResponse<String> response = request.asString();
 //            LOGGER.log(Level.WARNING, "Patch ::: status :" + response.getStatus());
 //            LOGGER.log(Level.WARNING, "Patch ::: body :" + response.getBody());
             if (response.getStatus() == 200) {
                 JSONObject resultJson = new JSONObject(response.getBody());
-                result.put("d", resultJson.getJSONArray("results"));
+                if(requestData.has("id")) {
+                    result.put("d", resultJson);
+                }else{
+                    result.put("d", resultJson.getJSONArray("results"));
+                }
                 if (resultJson.has("count")) {
                     result.put("c", resultJson.getInt("count"));
                 }
